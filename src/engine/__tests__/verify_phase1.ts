@@ -45,6 +45,13 @@ assert(
   `Got ${ds.currentEmergencyFund}`,
 );
 
+const overriddenProfile = buildDerivedState(DEFAULT_RAW_INPUTS, 'conservative');
+assert(
+  overriddenProfile.riskProfile === 'conservative',
+  'Risk profile override updates derived state',
+  `Got ${overriddenProfile.riskProfile}`,
+);
+
 // Test 1: Emergency Fund Target
 assert(
   ds.emergencyFundTargetRs === 6 * 40_000,
@@ -225,6 +232,13 @@ assert(
   `Got ${investDelay[1].liquidCash.toFixed(2)}`,
 );
 
+const expectedCash2Invest = expectedCash1Invest * (1 + state.monthlyInvestReturnPct) + surplus;
+assert(
+  approxEq(investDelay[2].liquidCash, expectedCash2Invest, 1),
+  'InvestDelay compounds the post-purchase balance from month 2',
+  `Got ${investDelay[2].liquidCash.toFixed(2)}`,
+);
+
 // Verify exponential growth exceeds linear surplus accumulation
 const linearCash12 = 150_000 + surplus * 12;
 // Note: invest_delay deducts the purchase price at affordMonth, so raw cash won't exceed linear
@@ -252,6 +266,14 @@ for (const id of actionIds) {
     `Got ${allTimelines[id].length}`,
   );
 }
+
+let rejectedShortOverride = false;
+try {
+  simulateAction('buy_now', state, [state.monthlyIncome], Array(13).fill(state.monthlyExpenses));
+} catch (error) {
+  rejectedShortOverride = error instanceof RangeError;
+}
+assert(rejectedShortOverride, 'Rejects income overrides with fewer than 13 values');
 
 // ── EMI with tenure > 12 (carryover debt rule) ──
 console.log('\n── EMI Carryover Debt (tenure=24) ──');

@@ -206,6 +206,7 @@ function simulateInvestDelay(state: DerivedState, income: number[], expenses: nu
     const inflatedPrice = state.itemPrice * Math.pow(1 + state.monthlyInflationPct, t);
     if (affordMonth === 13 && cash >= inflatedPrice) {
       affordMonth = t;
+      cash -= inflatedPrice;
     }
 
     pts.push({
@@ -214,16 +215,6 @@ function simulateInvestDelay(state: DerivedState, income: number[], expenses: nu
       emergencyFundRatio: cash / state.emergencyFundTargetRs,
       debtBalance: 0,
     });
-  }
-
-  // Phase 2: If purchase is affordable, deduct the price at affordMonth
-  //          and propagate the reduction to all subsequent months
-  if (affordMonth <= 12) {
-    const purchasePrice = state.itemPrice * Math.pow(1 + state.monthlyInflationPct, affordMonth);
-    for (let t = affordMonth; t <= 12; t++) {
-      pts[t].liquidCash -= purchasePrice;
-      pts[t].emergencyFundRatio = pts[t].liquidCash / state.emergencyFundTargetRs;
-    }
   }
 
   return pts;
@@ -255,6 +246,10 @@ export function simulateAction(
 ): SimPointD[] {
   const income = overrideIncome ?? Array(13).fill(state.monthlyIncome);
   const expenses = overrideExpenses ?? Array(13).fill(state.monthlyExpenses);
+
+  if (income.length !== 13 || expenses.length !== 13) {
+    throw new RangeError('Income and expense overrides must contain 13 monthly values');
+  }
 
   const simulator = ACTION_SIMULATORS[actionId];
   if (!simulator) {

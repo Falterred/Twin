@@ -131,6 +131,8 @@ export function buildDerivedState(
   return {
     ...rawInputs,
 
+    riskProfile: resolvedProfile,
+
     currentEmergencyFund: rawInputs.liquidCash,
 
     // Emergency fund target — guard against 0-expense edge case
