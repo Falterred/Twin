@@ -20,6 +20,15 @@ function assert(condition: boolean, label: string, detail?: string) {
   }
 }
 
+function expectThrows(action: () => void): boolean {
+  try {
+    action();
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 const state = buildDerivedState(DEFAULT_RAW_INPUTS);
 const results = evaluateAllDeterministic(state);
 
@@ -65,17 +74,36 @@ const baseTimeline = simulateAction('buy_now', state);
 const original = baseTimeline.map((point) => ({ ...point }));
 const shocked = applyShock(state, baseTimeline);
 const expectedShock = state.monthlyIncome * SHOCK_PARAMS.incomeDropPct + SHOCK_PARAMS.surpriseExpense;
+assert(shocked[0].liquidCash === original[0].liquidCash, 'Month 0 remains unchanged');
 assert(shocked[1].liquidCash === original[1].liquidCash, 'Shock starts at month 2');
 assert(shocked[2].liquidCash === original[2].liquidCash - expectedShock, 'Shock includes lost income and surprise expense');
-assert(shocked[12].liquidCash === original[12].liquidCash - expectedShock, 'Shock propagates through month 12');
+assert(shocked.slice(2).every((point, index) => point.liquidCash === original[index + 2].liquidCash - expectedShock), 'Shock propagates through months 2 through 12');
+assert(shocked.every((point) => point.emergencyFundRatio === point.liquidCash / state.emergencyFundTargetRs), 'Shocked ratios are recalculated');
 assert(JSON.stringify(baseTimeline) === JSON.stringify(original), 'Original timeline is unchanged');
+assert(shocked[0] !== baseTimeline[0] && shocked[12] !== baseTimeline[12], 'Timeline points are cloned');
 assert(shocked.every((point, index) => point.debtBalance === original[index].debtBalance), 'Debt balances are preserved');
 assert(survivesShock(state, baseTimeline) === false, 'Default buy-now path fails the shock');
 assert(survivesShock(buildDerivedState({ ...DEFAULT_RAW_INPUTS, liquidCash: 400_000 }), simulateAction('buy_now', buildDerivedState({ ...DEFAULT_RAW_INPUTS, liquidCash: 400_000 }))), 'High cash path survives the shock');
+assert(survivesShock(state, []) === false, 'Empty timelines fail safely');
+const invalidTargetState = buildDerivedState({ ...DEFAULT_RAW_INPUTS, monthlyExpenses: Number.NaN });
+const invalidTargetTimeline = simulateAction('buy_now', invalidTargetState);
+assert(survivesShock(invalidTargetState, invalidTargetTimeline) === false, 'Invalid emergency-fund targets fail safely');
+assert(expectThrows(() => applyShock(state, baseTimeline.slice(0, 12))), 'Malformed timelines are rejected');
 
 const normal = evaluateAllDeterministic(state);
-const shockFlags = normal.map((result) => result.survivesShock);
-assert(normal.some((result) => shockFlags.includes(result.survivesShock)), 'Shock status is present without changing evaluation');
+const evaluationSnapshot = normal.map((result) => ({
+  id: result.id,
+  score: result.score,
+  breakdown: { ...result.breakdown },
+}));
+normal.forEach((result) => {
+  applyShock(state, result.timeline);
+  survivesShock(state, result.timeline);
+});
+assert(normal.every((result, index) => result.id === evaluationSnapshot[index].id), 'Shock does not change ranking');
+assert(normal.every((result, index) => result.score === evaluationSnapshot[index].score), 'Shock does not change scores');
+assert(normal.every((result, index) => JSON.stringify(result.breakdown) === JSON.stringify(evaluationSnapshot[index].breakdown)), 'Shock does not change score breakdowns');
+assert(normal.every((result) => typeof result.survivesShock === 'boolean'), 'Shock status is present without changing evaluation');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 if (failed > 0) throw new Error(`${failed} verification test(s) failed`);
