@@ -7,10 +7,10 @@
 - [x] Part 3: Scoring function and constraint evaluator
 - [x] Part 5: Stress-test shock layer
 - [x] Part 4: Probabilistic Monte Carlo engine
+- [x] Part 6: Counterfactual explanation search
 
 ## Remaining Planned Work
 
-- [ ] Part 6: Counterfactual explanation search
 - [ ] Part 7: React UI components
 - [ ] Part 8: State management and recompute flow
 
@@ -38,3 +38,12 @@
 - [x] Calculate p10, p50, and p90 cash and emergency-fund bands
 - [x] Calculate probabilistic safety and action scores
 - [x] Preserve deterministic engine behavior
+
+## Part 6 Checklist
+
+- [x] Probe liquid cash, emergency-fund months, and item price
+- [x] Rebuild derived state for every probe
+- [x] Use 15-step binary search per candidate field
+- [x] Preserve original state and results
+- [x] Fall back across candidate fields
+- [x] Return finite counterfactual deltas or null
