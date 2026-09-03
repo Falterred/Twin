@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "tsx src/engine/__tests__/verify_phase1.ts",
+    "test": "tsx src/engine/__tests__/verify_phase1.ts && tsx src/engine/__tests__/verify_phase3_and_5.ts",
     "lint": "oxlint",
     "preview": "vite preview"
   },
