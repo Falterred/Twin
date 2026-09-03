@@ -26,7 +26,13 @@ export function calculateMonthlyEMI(
   annualRatePct: number,
   tenureMonths: number,
 ): number {
-  if (tenureMonths <= 0) return principal; // edge: instant payoff
+  if (!Number.isFinite(principal) || principal < 0
+    || !Number.isFinite(annualRatePct) || annualRatePct < 0
+    || !Number.isFinite(tenureMonths) || tenureMonths < 0
+    || !Number.isInteger(tenureMonths)) {
+    throw new RangeError('EMI inputs must be finite, non-negative, and tenure must be an integer');
+  }
+  if (tenureMonths === 0) return principal; // edge: instant payoff
   const r = annualRatePct / 12 / 100;
   if (r === 0) return principal / tenureMonths;
   const compounded = Math.pow(1 + r, tenureMonths);
@@ -247,7 +253,11 @@ export function simulateAction(
   const income = overrideIncome ?? Array(13).fill(state.monthlyIncome);
   const expenses = overrideExpenses ?? Array(13).fill(state.monthlyExpenses);
 
-  if (income.length !== 13 || expenses.length !== 13) {
+  const hasInvalidOverride = (values: number[]): boolean => Array.from({ length: 13 }, (_, index) => (
+    !Object.prototype.hasOwnProperty.call(values, index) || !Number.isFinite(values[index])
+  )).some(Boolean);
+  if (income.length !== 13 || expenses.length !== 13
+    || hasInvalidOverride(income) || hasInvalidOverride(expenses)) {
     throw new RangeError('Income and expense overrides must contain 13 monthly values');
   }
 

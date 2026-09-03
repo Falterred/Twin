@@ -12,7 +12,7 @@ function safeEmergencyFundRatio(cash: number, target: number): number {
 }
 
 function validateTimeline(timeline: SimPointD[]): void {
-  if (timeline.length !== LAST_MONTH + 1) {
+  if (!Array.isArray(timeline) || timeline.length !== LAST_MONTH + 1) {
     throw new RangeError('Stress-test timelines must contain 13 monthly points');
   }
 
@@ -60,7 +60,7 @@ export function survivesShock(
   state: DerivedState,
   timeline: SimPointD[],
 ): boolean {
-  if (timeline.length === FIRST_MONTH || state.emergencyFundTargetRs <= 0) {
+  if (!Array.isArray(timeline) || timeline.length === FIRST_MONTH || state.emergencyFundTargetRs <= 0) {
     return false;
   }
 

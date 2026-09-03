@@ -128,6 +128,31 @@ export function buildDerivedState(
 ): DerivedState {
   const resolvedProfile = riskProfile ?? rawInputs.riskProfile;
 
+  const numericInputs: (keyof RawInputs)[] = [
+    'liquidCash',
+    'monthlyIncome',
+    'monthlyExpenses',
+    'existingEMI',
+    'emergencyFundMonths',
+    'itemPrice',
+    'emiTenureMonths',
+    'emiAnnualRatePct',
+  ];
+  for (const key of numericInputs) {
+    if (!Number.isFinite(rawInputs[key])) {
+      throw new RangeError(`${key} must be a finite number`);
+    }
+  }
+  if (rawInputs.liquidCash < 0 || rawInputs.monthlyIncome < 0 || rawInputs.monthlyExpenses < 0
+    || rawInputs.existingEMI < 0 || rawInputs.emergencyFundMonths < 0 || rawInputs.itemPrice < 0
+    || rawInputs.emiTenureMonths < 0 || !Number.isInteger(rawInputs.emiTenureMonths)
+    || rawInputs.emiAnnualRatePct < 0) {
+    throw new RangeError('Financial inputs must use non-negative values and an integer EMI tenure');
+  }
+  if (!(resolvedProfile in WEIGHT_TABLE)) {
+    throw new RangeError(`Unknown risk profile: "${String(resolvedProfile)}"`);
+  }
+
   return {
     ...rawInputs,
 

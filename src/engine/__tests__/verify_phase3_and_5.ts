@@ -85,9 +85,13 @@ assert(shocked.every((point, index) => point.debtBalance === original[index].deb
 assert(survivesShock(state, baseTimeline) === false, 'Default buy-now path fails the shock');
 assert(survivesShock(buildDerivedState({ ...DEFAULT_RAW_INPUTS, liquidCash: 400_000 }), simulateAction('buy_now', buildDerivedState({ ...DEFAULT_RAW_INPUTS, liquidCash: 400_000 }))), 'High cash path survives the shock');
 assert(survivesShock(state, []) === false, 'Empty timelines fail safely');
-const invalidTargetState = buildDerivedState({ ...DEFAULT_RAW_INPUTS, monthlyExpenses: Number.NaN });
-const invalidTargetTimeline = simulateAction('buy_now', invalidTargetState);
-assert(survivesShock(invalidTargetState, invalidTargetTimeline) === false, 'Invalid emergency-fund targets fail safely');
+let rejectedInvalidTarget = false;
+try {
+  buildDerivedState({ ...DEFAULT_RAW_INPUTS, monthlyExpenses: Number.NaN });
+} catch (error) {
+  rejectedInvalidTarget = error instanceof RangeError;
+}
+assert(rejectedInvalidTarget, 'Invalid emergency-fund targets fail safely');
 assert(expectThrows(() => applyShock(state, baseTimeline.slice(0, 12))), 'Malformed timelines are rejected');
 
 const normal = evaluateAllDeterministic(state);

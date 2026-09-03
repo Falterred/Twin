@@ -43,6 +43,8 @@ assert(simulateActionMC('emi', state, 1).every((point) => point.p10 === point.p5
 assert(expectThrows(() => simulateActionMC('buy_now', state, 0)), 'Non-positive runs are rejected');
 
 assert(gaussianRandom(123, 0) === 123, 'Zero-deviation Gaussian returns its mean');
+assert(expectThrows(() => gaussianRandom(Number.NaN, 1)), 'Invalid Gaussian mean is rejected');
+assert(expectThrows(() => gaussianRandom(0, -1)), 'Invalid Gaussian deviation is rejected');
 const gaussianSamples = Array.from({ length: 2_000 }, () => gaussianRandom(0, 1));
 const sampleMean = gaussianSamples.reduce((sum, value) => sum + value, 0) / gaussianSamples.length;
 const sampleVariance = gaussianSamples.reduce((sum, value) => sum + value ** 2, 0) / gaussianSamples.length - sampleMean ** 2;

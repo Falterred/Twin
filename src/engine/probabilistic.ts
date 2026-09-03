@@ -72,6 +72,9 @@ const URGENCY_PENALTY: Record<Urgency, number> = {
 
 /** Generate a normally distributed sample using the Box-Muller transform. */
 export function gaussianRandom(mean: number, stdDev: number): number {
+  if (!Number.isFinite(mean) || !Number.isFinite(stdDev) || stdDev < 0) {
+    throw new RangeError('Gaussian mean must be finite and standard deviation must be finite and non-negative');
+  }
   if (stdDev === 0) return mean;
   let first = 0;
   while (first === 0) first = Math.random();

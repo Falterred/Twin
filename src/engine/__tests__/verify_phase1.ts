@@ -45,6 +45,14 @@ assert(
   `Got ${ds.currentEmergencyFund}`,
 );
 
+let rejectedInvalidInput = false;
+try {
+  buildDerivedState({ ...DEFAULT_RAW_INPUTS, monthlyIncome: Number.NaN });
+} catch (error) {
+  rejectedInvalidInput = error instanceof RangeError;
+}
+assert(rejectedInvalidInput, 'Rejects non-finite financial inputs');
+
 const overriddenProfile = buildDerivedState(DEFAULT_RAW_INPUTS, 'conservative');
 assert(
   overriddenProfile.riskProfile === 'conservative',
@@ -275,6 +283,15 @@ try {
 }
 assert(rejectedShortOverride, 'Rejects income overrides with fewer than 13 values');
 
+let rejectedSparseOverride = false;
+try {
+  const sparseIncome = new Array<number>(13);
+  simulateAction('buy_now', state, sparseIncome, Array(13).fill(state.monthlyExpenses));
+} catch (error) {
+  rejectedSparseOverride = error instanceof RangeError;
+}
+assert(rejectedSparseOverride, 'Rejects sparse income overrides');
+
 // ── EMI with tenure > 12 (carryover debt rule) ──
 console.log('\n── EMI Carryover Debt (tenure=24) ──');
 const longTenureState = buildDerivedState({
@@ -287,6 +304,14 @@ assert(
   'EMI with 24mo tenure: debtBalance[12] > 0 (carryover)',
   `Got ${longEmi[12].debtBalance.toFixed(2)}`,
 );
+
+let rejectedInvalidEMI = false;
+try {
+  calculateMonthlyEMI(60_000, -1, 12);
+} catch (error) {
+  rejectedInvalidEMI = error instanceof RangeError;
+}
+assert(rejectedInvalidEMI, 'Rejects invalid EMI inputs');
 
 // ═══════════════════════════════════════════════════════
 //  Summary
