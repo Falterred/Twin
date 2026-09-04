@@ -56,10 +56,11 @@ function ActionCard({ result, rank, staggerClass }: ActionCardProps) {
   return (
     <div
       id={`action-card-${result.id}`}
-      className={`glass-card p-4 animate-fade-in ${staggerClass}
-        ${result.disqualified ? 'opacity-60' : ''}
-        ${isTop ? 'glow-gold !border-amber-500/30' : ''}
-        transition-all duration-200`}
+      className={`glass-card p-4 transition-all duration-300 ease-out
+        ${staggerClass}
+        ${result.disqualified ? 'opacity-60 hover:opacity-70' : 'hover:scale-[1.02] hover:shadow-lg'}
+        ${isTop ? 'glow-gold !border-amber-500/40 shadow-lg shadow-amber-500/20' : 'hover:border-blue-400/30 dark:hover:border-blue-600/30'}
+        group cursor-default`}
     >
       {/* Card Header */}
       <div className="flex items-start justify-between mb-3">
@@ -67,11 +68,12 @@ function ActionCard({ result, rank, staggerClass }: ActionCardProps) {
           {/* Rank badge */}
           <div
             className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold text-white shrink-0
+              transition-all duration-200
               ${result.disqualified
                 ? 'bg-slate-400 dark:bg-slate-600'
                 : isTop
-                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30'
-                  : ''
+                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30 group-hover:scale-110 group-hover:shadow-xl'
+                  : 'group-hover:scale-110'
               }`}
             style={!result.disqualified && !isTop ? { backgroundColor: result.color } : undefined}
           >

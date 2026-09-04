@@ -126,10 +126,11 @@ export function CalibrationModal({ currentProfile, onSave, onClose }: Calibratio
                       id={`calibration-q${step}-opt${i}`}
                       onClick={() => selectAnswer(opt.points)}
                       className={`text-left p-4 rounded-xl border text-sm font-medium
-                        transition-all duration-200 cursor-pointer
+                        transition-all duration-300 cursor-pointer
+                        transform hover:scale-[1.02] active:scale-95
                         ${isSelected
-                          ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 glow-border'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                          ? 'border-blue-500 bg-blue-500/15 text-blue-700 dark:text-blue-300 shadow-lg shadow-blue-500/20 scale-[1.02]'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                         }`}
                     >
                       {opt.text}
@@ -166,26 +167,32 @@ export function CalibrationModal({ currentProfile, onSave, onClose }: Calibratio
             </>
           ) : (
             /* Results screen */
-            <div className="flex flex-col items-center text-center flex-1 justify-center">
+            <div className="flex flex-col items-center text-center flex-1 justify-center animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${PROFILE_COLORS[resultProfile]}
-                flex items-center justify-center mb-4 shadow-lg`}>
+                flex items-center justify-center mb-4 shadow-lg shadow-current/30
+                animate-bounce`}>
                 <Check className="w-8 h-8 text-white" />
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Your profile</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2 capitalize">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                Your profile
+              </p>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-50 mb-2 capitalize
+                animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
                 {resultProfile}
               </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-xs">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-xs
+                animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
                 {PROFILE_DESCRIPTIONS[resultProfile]}
               </p>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-400">
                 <button
                   id="calibration-retake"
                   onClick={() => { setStep(0); setAnswers([null, null, null]); }}
                   className="px-4 py-2 text-sm font-medium rounded-lg border
                     border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300
-                    hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                    hover:bg-slate-100 dark:hover:bg-slate-800 
+                    transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
                 >
                   Retake
                 </button>
@@ -193,8 +200,10 @@ export function CalibrationModal({ currentProfile, onSave, onClose }: Calibratio
                   id="calibration-save"
                   onClick={() => onSave(resultProfile)}
                   className="px-5 py-2 text-sm font-semibold rounded-lg
-                    bg-blue-600 text-white hover:bg-blue-700
-                    transition-all cursor-pointer shadow-lg shadow-blue-500/20"
+                    bg-gradient-to-r from-blue-600 to-blue-700 text-white 
+                    hover:from-blue-700 hover:to-blue-800
+                    transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/30
+                    hover:scale-105 active:scale-95"
                 >
                   {resultProfile === currentProfile ? 'Keep Profile' : 'Apply & Recalculate'}
                 </button>

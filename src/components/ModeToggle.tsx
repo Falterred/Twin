@@ -37,13 +37,15 @@ export function ModeToggle({ mode, onChange }: ModeToggleProps) {
             onClick={() => onChange(m.value)}
             aria-pressed={isActive}
             className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-              text-sm font-semibold transition-all duration-200 cursor-pointer
+              text-sm font-semibold transition-all duration-300 cursor-pointer
               ${isActive
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30 scale-[1.02]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95'
               }`}
           >
-            {m.icon}
+            <span className={`transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}>
+              {m.icon}
+            </span>
             <span className="hidden sm:inline">{m.label}</span>
             <span className="text-[10px] font-normal opacity-70 hidden lg:inline">
               {m.sublabel}
