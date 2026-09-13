@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (Part 10). Tailwind v4's `dark:` variant defaults to
+   `@media (prefers-color-scheme: dark)`, which ignores the theme toggle's `.dark` class on
+   <html> and makes every component style follow the OS setting instead. The toggle and the
+   hand-written `html.dark` rules below are class-based, so bind the variant to the class to
+   keep the two halves of the theme in sync. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* tailwindcss-animate powers the modal enter transitions (animate-in / fade-in /
+   zoom-in-95) used by the ScenarioDrilldown surface. */
+@plugin "tailwindcss-animate";
+
+/* ---------------------------------------------------------------------------
+ * Part 10 conventions that are not pinned to a hex token (author discretion,
+ * approved as part of the design-system rulings):
+ *   - Cards / panels:   rounded-2xl + .card-surface (bg-white/85, backdrop-blur-md)
+ *   - Chips / buttons:  rounded-xl
+ *   - Micro typography: text-[10px] chip labels, text-[11px] captions,
+ *                       text-xs body copy, text-sm/base headings
+ *   - Shadows:          shadow-xs for chips, shadow-lg/xl for floating surfaces
+ * ------------------------------------------------------------------------- */
+
+@layer base {
+  :root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color-scheme: light;
+  }
+
+  html {
+    /* Light mode base — always explicit so toggling works correctly */
+    background-color: #f8fafc;  /* slate-50 */
+    color: #0f172a;             /* slate-900 */
+  }
+
+  html.dark {
+    color-scheme: dark;
+    background-color: #020617;  /* slate-950 */
+    color: #f8fafc;             /* slate-50 */
+  }
+}
+
+/* Premium fintech card styling matching Part 10 specifications */
+.card-surface {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+}
+
+:is(.dark .card-surface) {
+  background-color: rgba(15, 23, 42, 0.80);
+  border-color: #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom subtle scrollbars for dense fintech interfaces */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+:is(.dark ::-webkit-scrollbar-thumb) {
+  background: rgba(51, 65, 85, 0.5);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}

@@ -1,0 +1,11 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Local environment
+.env
+
+# Planning/reference docs stay on disk but are never committed (kept out of the repo entirely)
+docs/vision/
+docs/plan/
